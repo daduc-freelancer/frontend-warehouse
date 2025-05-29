@@ -29,13 +29,7 @@ export default function LoginPage() {
       enqueueSnackbar("Vui lòng nhập mật khẩu", { variant: "warning" });
       return;
     }
-    // Localhost
-    // try {
-    //   const res = await fetch("http://localhost:8080/api/login", {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify({ email, password }),
-    //   });
+  
     // Vercel
     try {
       const API_URL = import.meta.env.VITE_API_URL;
