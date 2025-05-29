@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import {
   AppBar,
@@ -37,7 +37,6 @@ export default function DashboardLayout() {
     setMobileOpen(!mobileOpen);
   };
 
-  // const userEmail = localStorage.getItem("userEmail");
   const userName = localStorage.getItem("userName");
 
   const handleLogout = () => {

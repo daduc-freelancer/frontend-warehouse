@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
-  // Container,
   IconButton,
   InputAdornment,
   Paper,
@@ -11,9 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-// import { fetchUsers } from "../api";
 import { useSnackbar } from "notistack";
-// import bcrypt from "bcryptjs";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
