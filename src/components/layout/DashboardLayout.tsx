@@ -37,7 +37,7 @@ export default function DashboardLayout() {
     setMobileOpen(!mobileOpen);
   };
 
-  const userEmail = localStorage.getItem("userEmail");
+  // const userEmail = localStorage.getItem("userEmail");
   const userName = localStorage.getItem("userName");
 
   const handleLogout = () => {

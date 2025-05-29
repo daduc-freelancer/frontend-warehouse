@@ -50,10 +50,19 @@ export default function ThietBiTra() {
             "Ghi chú": row[5] || "",
           }));
 
-          setRows(formattedData);
-          setFilteredRows(formattedData);
+          //  👉 Lọc chỉ lấy thiết bị trả bởi đúng người đang đăng nhập
+          const filteredByUser = userName
+            ? formattedData.filter(
+                (row) => row["Người trả"].trim() === userName.trim()
+              )
+            : formattedData;
+
+          setRows(filteredByUser);
+          setFilteredRows(filteredByUser);
+          // setRows(formattedData);
+          // setFilteredRows(formattedData);
         } else {
-          console.error("Dữ liệu không phải mảng hoặc mảng rỗng:", rawData);
+          console.error("Dữ liệu không hợp lệ:", rawData);
         }
 
         setLoading(false);
