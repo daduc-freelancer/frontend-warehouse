@@ -29,14 +29,21 @@ export default function LoginPage() {
       enqueueSnackbar("Vui lòng nhập mật khẩu", { variant: "warning" });
       return;
     }
-
+    // Localhost
+    // try {
+    //   const res = await fetch("http://localhost:8080/api/login", {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify({ email, password }),
+    //   });
+    // Vercel
     try {
-      const res = await fetch("http://localhost:8080/api/login", {
+      const API_URL = import.meta.env.VITE_API_URL;
+      const res = await fetch(`${API_URL}/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-
       if (!res.ok) {
         const data = await res.json();
         enqueueSnackbar(data.message || "Đăng nhập thất bại", {
