@@ -19,6 +19,14 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
+  async function hashPassword(password: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+  }
+
   const handleLogin = async () => {
     if (!email.includes("@")) {
       enqueueSnackbar("Vui lòng nhập email hợp lệ", { variant: "warning" });
@@ -29,7 +37,7 @@ export default function LoginPage() {
       enqueueSnackbar("Vui lòng nhập mật khẩu", { variant: "warning" });
       return;
     }
-
+    const hashedPassword = await hashPassword(password);
     // Vercel
     try {
       const API_URL = import.meta.env.VITE_API_URL;
@@ -37,8 +45,8 @@ export default function LoginPage() {
       const res = await fetch(`${API_URL}/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // remove body
-        // body: JSON.stringify({ email, password }),
+    const hashedPassword = await hashPassword(password);
+        body: JSON.stringify({ email, password: hashedPassword  }),
       });
       if (!res.ok) {
         const data = await res.json();
