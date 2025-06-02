@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchMuonData, fetchTraData } from "../api";
+import { useNavigate } from "react-router-dom";
 import {
   Table,
   TableHead,
@@ -16,6 +17,7 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import useDebounce from "../hooks/useDebounce";
+import { enqueueSnackbar } from "notistack";
 
 type RowData = {
   "Ngày mượn": string;
@@ -34,8 +36,64 @@ export default function ThietBiMuon() {
   const [loading, setLoading] = useState(true);
   const userEmail = localStorage.getItem("userEmail");
   const userName = localStorage.getItem("userName");
+  const [sortColumn, setSortColumn] = useState<keyof RowData | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const debouncedSearch = useDebounce(search, 300);
+  const navigate = useNavigate();
+
+  const parseDate = (str: string) => {
+    const [day, month, year] = str.split("/").map(Number);
+    return new Date(year, month - 1, day); // JS dùng month 0-based
+  };
+
+  const handleSort = (column: keyof RowData) => {
+    const isAsc = sortColumn === column && sortDirection === "asc";
+    const newDirection = isAsc ? "desc" : "asc";
+
+    const sorted = [...filteredRows].sort((a, b) => {
+      const aValue = a[column];
+      const bValue = b[column];
+
+      // Nếu là ngày dạng dd/mm/yyyy
+      if (column === "Ngày mượn") {
+        const dateA = parseDate(String(aValue));
+        const dateB = parseDate(String(bValue));
+        return newDirection === "asc"
+          ? dateA.getTime() - dateB.getTime()
+          : dateB.getTime() - dateA.getTime();
+      }
+
+      // Boolean sort
+      if (typeof aValue === "boolean" && typeof bValue === "boolean") {
+        return newDirection === "asc"
+          ? Number(aValue) - Number(bValue)
+          : Number(bValue) - Number(aValue);
+      }
+
+      if (column === "Seri/SĐT") {
+        const aNum = parseFloat(String(aValue));
+        const bNum = parseFloat(String(bValue));
+        const aIsNum = !isNaN(aNum);
+        const bIsNum = !isNaN(bNum);
+
+        if (aIsNum && bIsNum) {
+          return newDirection === "asc" ? aNum - bNum : bNum - aNum;
+        }
+      }
+      // String sort (ép kiểu an toàn)
+      const aStr = String(aValue).toLowerCase();
+      const bStr = String(bValue).toLowerCase();
+
+      return newDirection === "asc"
+        ? aStr.localeCompare(bStr)
+        : bStr.localeCompare(aStr);
+    });
+
+    setSortColumn(column);
+    setSortDirection(newDirection);
+    setFilteredRows(sorted);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,13 +131,19 @@ export default function ThietBiMuon() {
 
         setRows(userFilteredData);
         setFilteredRows(userFilteredData);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Lỗi khi tải dữ liệu:", error);
+        if (error.message?.includes("Failed to fetch")) {
+          enqueueSnackbar("Không thể kết nối server. Vui lòng đăng nhập lại.", {
+            variant: "error",
+          });
+          localStorage.clear();
+          navigate("/");
+        }
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
@@ -151,17 +215,26 @@ export default function ThietBiMuon() {
       ) : (
         <TableContainer component={Paper} sx={{ marginTop: 2 }}>
           <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Ngày mượn</TableCell>
-                <TableCell>Tên thiết bị</TableCell>
-                <TableCell>Seri/SĐT</TableCell>
-                {/* <TableCell>Biển số xe</TableCell> */}
-                <TableCell>Người mượn</TableCell>
-                <TableCell>Đã trả</TableCell>
-                <TableCell>Ghi chú</TableCell>
-              </TableRow>
-            </TableHead>
+            <TableRow>
+              {[
+                "Ngày mượn",
+                "Tên thiết bị",
+                "Seri/SĐT",
+                "Người mượn",
+                "Đã trả",
+                "Ghi chú",
+              ].map((col) => (
+                <TableCell
+                  key={col}
+                  onClick={() => handleSort(col as keyof RowData)}
+                  sx={{ cursor: "pointer", fontWeight: "bold" }}
+                >
+                  {col}
+                  {sortColumn === col &&
+                    (sortDirection === "asc" ? " 🔼" : " 🔽")}
+                </TableCell>
+              ))}
+            </TableRow>
             <TableBody>
               {filteredRows.length === 0 ? (
                 <TableRow>

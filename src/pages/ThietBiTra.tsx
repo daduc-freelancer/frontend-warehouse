@@ -15,6 +15,8 @@ import {
   InputAdornment,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import { useSnackbar } from "notistack";
+import { useNavigate } from "react-router-dom";
 // Định nghĩa kiểu dữ liệu cho hàng
 type RowData = {
   "Ngày trả": string;
@@ -32,6 +34,8 @@ export default function ThietBiTra() {
   const [loading, setLoading] = useState(true);
   const userEmail = localStorage.getItem("userEmail");
   const userName = localStorage.getItem("userName");
+  const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     fetchTraData()
@@ -69,6 +73,13 @@ export default function ThietBiTra() {
       })
       .catch((error) => {
         console.error("Lỗi khi gọi API:", error);
+        if (error.message?.includes("Failed to fetch")) {
+          enqueueSnackbar("Không thể kết nối server. Vui lòng đăng nhập lại.", {
+            variant: "error",
+          });
+          localStorage.clear();
+          navigate("/");
+        }
         setLoading(false);
       });
   }, []);

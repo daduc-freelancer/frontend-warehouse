@@ -29,7 +29,7 @@ export default function LoginPage() {
       enqueueSnackbar("Vui lòng nhập mật khẩu", { variant: "warning" });
       return;
     }
-  
+
     // Vercel
     try {
       const API_URL = import.meta.env.VITE_API_URL;
@@ -50,11 +50,20 @@ export default function LoginPage() {
       const user = await res.json();
       localStorage.setItem("userEmail", user.email);
       localStorage.setItem("userName", user.name);
+      localStorage.setItem("token", user.token);
       enqueueSnackbar("Đăng nhập thành công!", { variant: "success" });
 
       navigate("/thiet-bi-muon");
     } catch (error) {
-      enqueueSnackbar("Lỗi kết nối tới server.", { variant: "error" });
+      enqueueSnackbar("Lỗi kết nối tới máy chủ. Đang thử lại...", {
+        variant: "error",
+      });
+      // Redirect về trang login sau 2s (tuỳ chỉnh)
+      setTimeout(() => {
+        localStorage.removeItem("userEmail");
+        localStorage.removeItem("userName");
+        navigate("/login");
+      }, 2000);
     }
   };
 
