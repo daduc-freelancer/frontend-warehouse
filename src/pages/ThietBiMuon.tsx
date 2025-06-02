@@ -215,26 +215,28 @@ export default function ThietBiMuon() {
       ) : (
         <TableContainer component={Paper} sx={{ marginTop: 2 }}>
           <Table>
-            <TableRow>
-              {[
-                "Ngày mượn",
-                "Tên thiết bị",
-                "Seri/SĐT",
-                "Người mượn",
-                "Đã trả",
-                "Ghi chú",
-              ].map((col) => (
-                <TableCell
-                  key={col}
-                  onClick={() => handleSort(col as keyof RowData)}
-                  sx={{ cursor: "pointer", fontWeight: "bold" }}
-                >
-                  {col}
-                  {sortColumn === col &&
-                    (sortDirection === "asc" ? " 🔼" : " 🔽")}
-                </TableCell>
-              ))}
-            </TableRow>
+            <TableHead>
+              <TableRow>
+                {[
+                  "Ngày mượn",
+                  "Tên thiết bị",
+                  "Seri/SĐT",
+                  "Người mượn",
+                  "Đã trả",
+                  "Ghi chú",
+                ].map((col) => (
+                  <TableCell
+                    key={col}
+                    onClick={() => handleSort(col as keyof RowData)}
+                    sx={{ cursor: "pointer", fontWeight: "bold" }}
+                  >
+                    {col}
+                    {sortColumn === col &&
+                      (sortDirection === "asc" ? " 🔼" : " 🔽")}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
             <TableBody>
               {filteredRows.length === 0 ? (
                 <TableRow>
