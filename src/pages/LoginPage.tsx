@@ -62,7 +62,7 @@ export default function LoginPage() {
       setTimeout(() => {
         localStorage.removeItem("userEmail");
         localStorage.removeItem("userName");
-        navigate("/login");
+        navigate("/");
       }, 2000);
     }
   };
