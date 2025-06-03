@@ -32,10 +32,17 @@ export default function ThietBiTra() {
   const [filteredRows, setFilteredRows] = useState<RowData[]>([]); // Đảm bảo kiểu dữ liệu là mảng RowData
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [sortColumn, setSortColumn] = useState<keyof RowData | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const userEmail = localStorage.getItem("userEmail");
   const userName = localStorage.getItem("userName");
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
+
+  const parseDate = (str: string) => {
+    const [day, month, year] = str.split("/").map(Number);
+    return new Date(year, month - 1, day); // JS dùng month 0-based
+  };
 
   useEffect(() => {
     fetchTraData()
@@ -72,7 +79,7 @@ export default function ThietBiTra() {
         setLoading(false);
       })
       .catch((error) => {
-        console.error("Lỗi khi gọi API:", error);
+        // console.error("Lỗi khi gọi API:", error);
         if (error.message?.includes("Failed to fetch")) {
           enqueueSnackbar("Không thể kết nối server. Vui lòng đăng nhập lại.", {
             variant: "error",
@@ -83,6 +90,46 @@ export default function ThietBiTra() {
         setLoading(false);
       });
   }, []);
+
+  const handleSort = (column: keyof RowData) => {
+    const isAsc = sortColumn === column && sortDirection === "asc";
+    const newDirection = isAsc ? "desc" : "asc";
+
+    const sorted = [...filteredRows].sort((a, b) => {
+      const aVal = String(a[column]).toLowerCase();
+      const bVal = String(b[column]).toLowerCase();
+      // Nếu là ngày dạng dd/mm/yyyy
+      if (column === "Ngày trả") {
+        const dateA = parseDate(String(aVal));
+        const dateB = parseDate(String(bVal));
+        return newDirection === "asc"
+          ? dateA.getTime() - dateB.getTime()
+          : dateB.getTime() - dateA.getTime();
+      }
+
+      // Nếu là số điện thoại hoặc seri (ưu tiên số)
+      if (column === "Seri/SĐT") {
+        const aNum = parseFloat(String(aVal));
+        const bNum = parseFloat(String(bVal));
+        const aIsNum = !isNaN(aNum);
+        const bIsNum = !isNaN(bNum);
+        if (aIsNum && bIsNum) {
+          return newDirection === "asc" ? aNum - bNum : bNum - aNum;
+        }
+      }
+
+      // So sánh dạng chuỗi cho các cột còn lại
+      const aStr = String(aVal).toLowerCase();
+      const bStr = String(bVal).toLowerCase();
+      return newDirection === "asc"
+        ? aStr.localeCompare(bStr)
+        : bStr.localeCompare(aStr);
+    });
+
+    setSortColumn(column);
+    setSortDirection(newDirection);
+    setFilteredRows(sorted);
+  };
 
   useEffect(() => {
     if (!search.trim()) {
@@ -148,16 +195,31 @@ export default function ThietBiTra() {
             <CircularProgress />
           </Box>
         ) : (
-          <TableContainer component={Paper} sx={{ marginTop: 2 }}>
+          <TableContainer
+            component={Paper}
+            sx={{ marginTop: 2, tableLayout: "fixed", width: "100%" }}
+          >
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Ngày trả</TableCell>
-                  <TableCell>Tên thiết bị</TableCell>
-                  <TableCell>Seri/SĐT</TableCell>
-                  <TableCell>Biển số xe</TableCell>
-                  <TableCell>Người trả</TableCell>
-                  <TableCell>Ghi chú</TableCell>
+                  {[
+                    "Ngày trả",
+                    "Tên thiết bị",
+                    "Seri/SĐT",
+                    "Biển số xe",
+                    "Người trả",
+                    "Ghi chú",
+                  ].map((col) => (
+                    <TableCell
+                      key={col}
+                      onClick={() => handleSort(col as keyof RowData)}
+                      sx={{ cursor: "pointer", fontWeight: "bold" }}
+                    >
+                      {col}
+                      {sortColumn === col &&
+                        (sortDirection === "asc" ? " 🔼" : " 🔽")}
+                    </TableCell>
+                  ))}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -171,7 +233,17 @@ export default function ThietBiTra() {
                   filteredRows.map((row, idx) => (
                     <TableRow key={idx}>
                       {Object.values(row).map((cell, cid) => (
-                        <TableCell key={cid}>{cell}</TableCell>
+                        <TableCell
+                          key={cid}
+                          sx={{
+                            width: 200,
+                            whiteSpace: "normal",
+                            wordBreak: "break-word",
+                            overflowWrap: "break-word",
+                          }}
+                        >
+                          {cell}
+                        </TableCell>
                       ))}
                     </TableRow>
                   ))

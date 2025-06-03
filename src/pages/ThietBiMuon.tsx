@@ -213,7 +213,10 @@ export default function ThietBiMuon() {
           <CircularProgress />
         </Box>
       ) : (
-        <TableContainer component={Paper} sx={{ marginTop: 2 }}>
+        <TableContainer
+          component={Paper}
+          sx={{ marginTop: 2, tableLayout: "fixed", width: "100%" }}
+        >
           <Table>
             <TableHead>
               <TableRow>
@@ -247,13 +250,70 @@ export default function ThietBiMuon() {
               ) : (
                 filteredRows.map((row, idx) => (
                   <TableRow key={idx}>
-                    <TableCell>{row["Ngày mượn"]}</TableCell>
-                    <TableCell>{row["Tên thiết bị"]}</TableCell>
-                    <TableCell>{row["Seri/SĐT"]}</TableCell>
-                    {/* <TableCell>{row["Biển số xe"]}</TableCell> */}
-                    <TableCell>{row["Người mượn"]}</TableCell>
-                    <TableCell>{row["Đã trả"] ? "✅" : "❌"}</TableCell>
-                    <TableCell>{row["Ghi chú"]}</TableCell>
+                    <TableCell
+                      sx={{
+                        width: 200,
+                        whiteSpace: "normal",
+                        wordBreak: "break-word",
+                        overflowWrap: "break-word",
+                      }}
+                    >
+                      {row["Ngày mượn"]}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        width: 200,
+                        whiteSpace: "normal",
+                        wordBreak: "break-word",
+                        overflowWrap: "break-word",
+                      }}
+                    >
+                      {row["Tên thiết bị"]}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        width: 200,
+                        whiteSpace: "normal",
+                        wordBreak: "break-word",
+                        overflowWrap: "break-word",
+                      }}
+                    >
+                      {row["Seri/SĐT"]}
+                    </TableCell>
+                    {/* <TableCell sx={{width: 200,
+    whiteSpace: "normal",
+    wordBreak: "break-word",
+    overflowWrap: "break-word",}}>{row["Biển số xe"]}</TableCell> */}
+                    <TableCell
+                      sx={{
+                        width: 200,
+                        whiteSpace: "normal",
+                        wordBreak: "break-word",
+                        overflowWrap: "break-word",
+                      }}
+                    >
+                      {row["Người mượn"]}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        width: 200,
+                        whiteSpace: "normal",
+                        wordBreak: "break-word",
+                        overflowWrap: "break-word",
+                      }}
+                    >
+                      {row["Đã trả"] ? "✅" : "❌"}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        width: 200,
+                        whiteSpace: "normal",
+                        wordBreak: "break-word",
+                        overflowWrap: "break-word",
+                      }}
+                    >
+                      {row["Ghi chú"]}
+                    </TableCell>
                   </TableRow>
                 ))
               )}
