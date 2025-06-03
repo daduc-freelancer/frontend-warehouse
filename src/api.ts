@@ -5,18 +5,6 @@ const API = axios.create({
   baseURL: `${import.meta.env.VITE_API_URL}/api`,
   withCredentials: true,
 });
-
-// ✅ Interceptor bắt lỗi 401 chung
-API.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.clear();
-      window.location.href = "/login"; // dùng window.location vì ở ngoài React component
-    }
-    return Promise.reject(error);
-  }
-);
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
@@ -24,6 +12,18 @@ API.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// ✅ Interceptor bắt lỗi 401 chung
+API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.clear();
+      window.location.href = "/"; // dùng window.location vì ở ngoài React component
+    }
+    return Promise.reject(error);
+  }
+);
 
 //api mượn
 export const fetchMuonData = async () => {
