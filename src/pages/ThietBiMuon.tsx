@@ -187,7 +187,7 @@ export default function ThietBiMuon() {
       <Box display="flex" justifyContent="center" mt={2}>
         <TextField
           variant="outlined"
-          placeholder="Tìm kiếm thiết bị, SĐT, biển số xe..."
+          placeholder="Tìm kiếm thiết bị, SĐT"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           size="small"

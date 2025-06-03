@@ -47,7 +47,7 @@ export default function ThietBiTra() {
   useEffect(() => {
     fetchTraData()
       .then((data) => {
-        console.log("Dữ liệu API trả về:", data);
+        // console.log("Dữ liệu API trả về:", data);
 
         // Kiểm tra nếu API trả về dữ liệu chứa mảng
         const rawData = data.data || data; // Tùy thuộc vào cấu trúc của API trả về
